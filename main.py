@@ -1,6 +1,6 @@
 import os,json,urllib.request as U,time
 V={80:100,66:320,98:330,82:500,81:900,75:20000}
-B=[0]*64;S=1
+B=[0]*64;S=1;A='abcdefgh'
 def L(f):
  global B,S;p=f.split();B=[0]*64;S=1 if p[1]=='w' else -1
  for r,row in enumerate(p[0].split('/')):
@@ -98,14 +98,14 @@ def BM(f):
   sc=-S2(B,-s,2,-999999,999999);U2(B,m,c)
   if sc>bs:bs=sc;be=m
  if not be:return '0000'
- a,b,p=be;u='abcdefgh'[a%8]+str(8-a//8)+'abcdefgh'[b%8]+str(8-b//8);return u+'q' if p else u
+ a,b,p=be;u=A[a%8]+str(8-a//8)+A[b%8]+str(8-b//8);return u+'q'*p
 def P(u,o):
  d=json.dumps(o).encode();q=U.Request(u,d,{'Content-Type':'application/json'})
  try:
   with U.urlopen(q,timeout=12) as r:return json.loads(r.read() or b'{}')
  except:return {}
 def main():
- b=os.environ.get('MAKEFUN_ENV_URL','')
+ b=os.getenv('MAKEFUN_ENV_URL','')
  if not b:print(BM('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'));return
  while True:
   g=P(b+'/game',{})
@@ -113,11 +113,10 @@ def main():
   f=g.get('fen') or 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
   col=g.get('colour') or g.get('color')
   if col:
-   sd='w' if f.split()[1]=='w' else 'b'
-   if (col=='white' and sd!='w') or (col=='black' and sd!='b'):time.sleep(0.05);continue
+   if col[0]!=f.split()[1]:time.sleep(0.05);continue
   mv=BM(f);r=P(b+'/move',{'game':g.get('game',g.get('id',0)),'move':mv})
   if r.get('legal')==False:
    L(f);ms=M(B,S)
    if ms:
-    a,b2,p=ms[0];mv='abcdefgh'[a%8]+str(8-a//8)+'abcdefgh'[b2%8]+str(8-b2//8);P(b+'/move',{'game':g.get('game',0),'move':mv})
+    a,b2,p=ms[0];mv=A[a%8]+str(8-a//8)+A[b2%8]+str(8-b2//8);P(b+'/move',{'game':g.get('game',0),'move':mv})
 main()
